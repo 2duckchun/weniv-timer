@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIMER</title>
+    <style>
+        html {
+            background: #A5B6EE;
+        }
+        img {
+            top: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            position: absolute;
+            display: block;
+            width: 244px;
+            margin: auto;
+            text-align: center;
+        }
+        .container {
+            position: relative;
+            margin: auto;
+            width: 400px;
+            height: 360px;
+            top: 180px;
+            background: linear-gradient(144.07deg, #5572BB 2.13%, #374B7C 102.97%);
+            /* shadow */
+            box-shadow: 20px 20px 60px 10px rgba(55, 75, 124, 0.4);
+            border-radius: 16px;
+        }
+        .sect-timer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .tit-timer {            
+            width: 73px;
+            height: 29px;
+            font-family: 'Pretendard';
+            font-style: normal;
+            font-weight: 700;
+            font-size: 24px;
+            line-height: 29px;
+            text-align: center;
+            color: #FFFFFF;
+            margin-top: 48px;
+        }
+        .divide {
+            margin: 0px 44px 60px;
+            height: 1px;
+            width: 312px;
+            background: url(./src/line.png)
+        }
+        input {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(314.28deg, #304577 0%, #4C65A0 83%);
+            border: 1px solid #354971;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 25px;
+            font-family: 'Pretendard';
+            font-style: normal;
+            font-weight: 700;
+            font-size: 40px;
+            line-height: 48px;
+            /* identical to box height */
+            text-align: center;
+            color: #FFFFFF;
+        }
+        .cont-btn-timer {
+            margin-top: 35px;
+        }
+        
+    </style>
+</head>
+<body>
+    <img src="./src/weniv-logo.png" alt="">
+    <div class="container">
+        <section class="sect-timer">
+            <h1 class="tit-timer">TIMER</h1>
+            <div class="divide"></div>
+            <div class="hms-timer">
+                <input class="hours" type="number" value="0"> : <input class="minutes" type="number"  value="0"> : <input class="seconds" type="number"  value="0">        
+            </div>
+            <div class="cont-btn-timer"> 
+                <button class="start">START</button>
+                <button class="reset">RESET</button>
+            </div>
+        </section>
+    </div>
+    <script>
+
+            /*
+
+            정리
+            
+            @@ 타이머 로직에 대한 생각
+            1. start 버튼을 누르면 타이머가 시작됨 -> isRunning이라는 변수를 true로 함.
+
+            2. 1초마다 시간초를 재는 interval 함수는 isRunning이 false일 때, 그리고 isPause가 true일 때 return (타이머를 재지 않음)
+               - interval은 go라는 함수를 1000ms마다 호출하며, go는 흐르는 시간을 주어진 로직에 맞게 화면에 렌더링함.
+                / go 함수 = input에 적힌 value대로 카운트를 세면서 숫자를 렌더링해주는 함수.
+            3. isPause를 누르면 isRunning이 false가 되고, isPause는 true가 됨. 따라서 go 함수는 멈추게 됨.
+
+            4. 시, 분, 초 모두 값이 0인 상태에서 isRunning이 true라면 isRunning을 false로 만든 뒤, alert으로 'finish'를 띄워줌.
+
+
+            @@ 버튼 로직에 대한 생각
+            1. CSS와 연계해서 이미지를 바꾸면서 해야할 것이라는 생각이 들었음.
+            2. 로직은 살리고, 그림에 대한 클래스만 따로 추가해야할 것 같음.
+            3. 시간이 더 있다면 하나하나 실험해보며 작업이 가능할 것이라 생각됨.
+
+
+            @@ html/css에 대한 생각
+            1. 시간초를 입력해야하므로 input창이 맞다고 생각되나, isRunning이나 isPause가 true일때는 수정이 불가능하게 
+               DOM을 조작해서 입력 불가능 속성으로 고쳐야함.
+               또는... 시연영상에서는 클릭하면 10초씩 늘어나는 기능이 있던데, 이것은 명세를 확실히 해야함.
+            2. 
+            */
+
+            const startBtn = document.querySelector('.start')
+            const resetBtn = document.querySelector('.reset')
+            const hours = document.querySelector('.hours')
+            const minutes = document.querySelector('.minutes')
+            const seconds = document.querySelector('.seconds')
+
+            let isRunning = false
+            let isPause = false
+
+            startBtn.addEventListener('click', () => {
+                // 아무것도 입력하지 않았을 때, START 버튼이 PAUSE 버튼이 되는 것을 방지하기 위함.
+                if (+hours.value === 0 && +minutes.value === 0 && +seconds.value === 0) return
+
+                // 시작되지 않았거나, 정지상태일 때 스위치를 바꿔주는 기능 (START 버튼 기능)
+                if (!isRunning || isPause) {
+                    isRunning = true
+                    isPause = false
+                    startBtn.textContent = "PAUSE"
+                } else { // 위의 반대상황일 때 타이머를 멈출 수 있도록 스위치를 바꿔주는 기능 (PAUSE 버튼 기능)
+                    isRunning = false
+                    isPause = true
+                    startBtn.textContent = "START"
+                }
+            })
+
+
+            // 리셋을 눌렀을 때, 내부 시간초와 스위치들, start 버튼까지 모두 초기화 해주는 기능 (RESET 버튼 기능)
+            resetBtn.addEventListener('click', () => {
+                isRunning = false
+                isPause = false
+                seconds.value = 0
+                minutes.value = 0
+                hours.value = 0
+                startBtn.textContent = "START"
+            })
+
+
+            // 계속 실행되면서 go 함수를 실행할지 말지 결정하는 기능
+            // isRunning이 false거나 isPause가 true이면 go 함수를 실행하지 않음(타이머를 렌더링하지 않음)
+            // 1000ms 마다 실행됨.
+            const interval = setInterval(() => {
+                if (!isRunning || isPause) return
+                go()
+            }, 1000)
+
+
+            // 다소 정리가 안된 로직.
+            // 실행되면 내부 if문으로 필요한 조건들을 비교한 후, 화면에 렌더링함.
+            const go = () => {
+                if (seconds.value > 60) seconds.value = 60
+                if (seconds.value > 0) {
+                    seconds.value = seconds.value - 1
+                }
+
+                if (minutes.value > 60) minutes.value = 60
+                if (+minutes.value >= 1 && +seconds.value === 0) {
+                    minutes.value = minutes.value - 1
+                    seconds.value = 59
+                }
+
+                if (hours.value > 24) hours.value = 24
+                if (+hours.value >= 1 && +minutes.value === 0) {
+                    hours.value = hours.value - 1
+                    minutes.value = 59
+                    seconds.value = 59
+                }
+
+
+                if (+hours.value === 0 && +minutes.value === 0 && +seconds.value === 0 && isRunning) {
+                    seconds.value = 0
+                    hours.value = 0
+                    minutes.value = 0
+                    isRunning = false
+                    alert('finish')
+                }
+            }
+
+    </script>
+</body>
+</html>
